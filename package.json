@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "@discordjs/voice": "^0.16.0",
+    "deepspeech": "^0.9.3",
+    "discord-speech-recognition": "^3.4.1",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "ffmpeg-static": "^5.1.0",
+    "i": "^0.3.7",
+    "libsodium-wrappers": "^0.7.11",
+    "node-fetch": "^3.3.2",
+    "npm": "^9.8.1",
+    "path": "^0.12.7",
+    "urban": "^0.3.4",
+    "ytdl-core": "^4.11.5"
+  },
+  "name": "spinny-bot-2.0",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
