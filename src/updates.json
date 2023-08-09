@@ -7,8 +7,22 @@
       "New voice command: 'list aliases <user>": "This command allows users to list all of the aliases that have been created for a user."
     },
     "In progress": {
-      "New command: /list aliases <user>": "This command will allow users to list all of the aliases that have been created for a user.",
+      "New command: /listaliases <user>": "This command will allow users to list all of the aliases that have been created for a user.",
       "Auto generating more aliases": "Currently the aliases are automatically generated for the username and the nickname of the user. However, the display name is not recognized by the bot. I am working on a way to automatically generate aliases for the display name as well."
+    }
+  },
+  "08-08-2023": {
+    "Added": {
+      "New command /listaliases <user>": "This command allows users to list all of the aliases that have been created for a user.",
+      "New command /generateinvite <server-id>": "Generate an invite using the id of a server that Spinny Bot is in. See all of the servers that Spinny Bot is in by using the command /serverlist"
+    },
+    "Changed": {
+      "Reworked 'mods crush <user>s skull' voice command": "The command now has better name recognition so it will be easier to use.",
+      "Edited voice commands to recognize commands anywhere in the sentence": "Previously, the voice commands would only work if the command was the first word in the sentence. Now, the voice commands will work anywhere in the sentence."
+    },
+    "In progress": {
+      "New command: /addvoicecommand <command> <response>": "This command will allow users to add new voice commands to the bot by providing mp3 files.",
+      "Updating custom voice command handling": "The bot will be updated to handle custom voice commands better (Nothing will really change on the user's end)."
     }
   }
 }

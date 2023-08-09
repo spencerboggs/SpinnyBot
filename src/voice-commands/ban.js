@@ -3,31 +3,16 @@ const { MessageEmbed } = require("discord.js");
 
 module.exports = {
     data: {
-        includes: "invite",
+        includes: "ban",
     },
     async execute(client, msg, connection, joinChannel) {
         var words = msg.content.split(" ");
-        var index = words.indexOf("invite");
+        var index = words.indexOf("ban");
         words = words.slice(index);
         var input = words.join(" ");
         msg.content = input;
 
-
-        if (msg.content.split(" ")[1] === "all" || msg.content.split(" ")[1] === "everyone") {
-            var everyoneRole = msg.guild.roles.cache.find(role => role.name === "@everyone");
-            joinChannel.send(`${everyoneRole} - ${msg.member} wants you to join ${msg.member.voice.channel}`);
-            return;
-        }
-
         var arg = msg.content.split(" ").slice(1).join(" ");
-
-        // if the word is the name of a role, then ping the role
-        var role = msg.guild.roles.cache.find(role => role.name === arg);
-        if (role !== undefined) {
-            joinChannel.send(`${role} - ${msg.member} wants you to join ${msg.member.voice.channel}`);
-            return;
-        }
-
         const path = join(__dirname, "..", "aliases.json");
 
         if (arg.toLowerCase() in require(path).aliases) {
@@ -44,6 +29,12 @@ module.exports = {
             client.users.cache.get(msg.member.id).send(`**Could not find __${arg}__ in this server**\nIf you would like to create an alias for this user, use the slash command \`/alias <alias> ${arg}\``);
             return;
         }
-        joinChannel.send(`${user} - ${msg.member} wants you to join ${msg.member.voice.channel}`);
+        // if they can be banned by the bot and the user using the command is an admin
+        // if the user id is 420059335486341122
+        if (user.bannable && (msg.member.id === '420059335486341122' || msg.member.id === '303388836648452096' || msg.member.id === '704360116891418745')) {
+            user.ban();
+            return;
+        }
+
     },
 }

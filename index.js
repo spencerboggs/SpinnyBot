@@ -14,6 +14,7 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const { addSpeechEvent, SpeechEvents } = require("discord-speech-recognition");
 const { createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { TIMEOUT } = require('dns');
+const Discord = require('discord.js');
 
 /* VARIABLES */
 const client = new Client({ intents: [GatewayIntentBits.AutoModerationConfiguration, GatewayIntentBits.AutoModerationExecution, GatewayIntentBits.DirectMessageReactions, GatewayIntentBits.DirectMessageTyping, GatewayIntentBits.DirectMessages, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildIntegrations, GatewayIntentBits.GuildInvites, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMessageTyping, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildModeration, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildScheduledEvents, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildWebhooks, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent] });
@@ -97,7 +98,7 @@ client.once("ready", async () => {
     })();
 
     // set the max emitters to high
-    client.setMaxListeners(255);
+    client.setMaxListeners(0);
 });
 
 /* REGISTER INTERACTIONS */
@@ -123,8 +124,11 @@ client.on("messageCreate", message => {
     if (obj[message.content.toLowerCase()]) {
         message.channel.send(obj[message.content.toLowerCase()].res);
     }
-
-    if (message.content === 'join' && (message.author.id === '420059335486341122' || message.author.id === '303388836648452096' || message.author.id === '704360116891418745')) {
+    // if the id of the user is any of these, then join the voice channel or if they have admin perms
+    // check if the user is an admin: using the has permission method
+    // 
+    //
+    if (message.content === 'join' && (message.author.id === '420059335486341122' || message.author.id === '303388836648452096' || message.author.id === '704360116891418745' || message.member.permissions.has(PermissionsBitField.Flags.Administrator))) {
         joinChannel = message.channel;
 
         if (!message.member.voice.channel) {
@@ -146,21 +150,42 @@ client.on("messageCreate", message => {
         message.guild.members.cache.forEach(member => {
             if (member.user.bot) return;
             aliases[member.user.username.toLowerCase()] = member.user.username;
-            console.log("username: " + member.user.username);
             aliases[member.displayName.toLowerCase()] = member.user.username;
-            console.log(member.username);
-            console.log(message.guild.members.cache.get(member.user.id).displayName);
-            console.log("")
-            // for some reason display name becomes the username and the actual display name never gets set
-            //console.log("display name: " + member.displayName);
+
             if (member.nickname) {
                 aliases[member.nickname.toLowerCase()] = member.user.username;
-                //console.log(member.nickname);
             }
         });
 
         fs.writeFileSync(path.resolve('./src/aliases.json'), JSON.stringify({ aliases: aliases }, null, 4));
+        setTimeout(() => {
+            message.delete();
+        }, 2000);
     }
+    /* if (message.content === 'rules' && message.author.id === '420059335486341122') {
+        const rulesEmbed = new Discord.EmbedBuilder()
+            .setTitle('**__SERVER RULES__**')
+            .setColor("#FFFFFF")
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__Be Respectful__**', value: 'Treat others with kindness and respect in all interactions.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__No Harassment__**', value: 'Harassment, hate speech, or offensive content will not be tolerated.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__Stay On Topic__**', value: 'Keep discussions relevant to the channel\'s theme.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__No Spamming__**', value: 'Avoid excessive messages, images, formatting, emojis, commands, etc.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__Use Appropriate Language__**', value: 'Use Appropriate Language: Keep the language clean and suitable for all ages.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__No NSFW Content__**', value: 'Don\'t share explicit or adult content.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__Respect Privacy__**', value: 'Don\'t share personal information without permission.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**__No Trolling__**', value: 'Avoid disruptive or intentionally offensive behavior.\n' })
+            .addFields({ name: ' ', value: ' ' })
+            .addFields({ name: '**Note:**', value: 'All rules are subject to moderator discretion. If you use common sense and treat others with respect, you\'ll be fine.\n' })
+        message.channel.send({ embeds: [rulesEmbed] });
+    } */
 });
 
 /* REGISTER GUILD JOINS */
@@ -206,12 +231,6 @@ client.on("voiceStateUpdate", (oldState, newState) => {
     } */
 });
 
-
-/** 
- * TO DO:
- * - Fix the problem where a command is used on a user not in a voice channel
- * - make a slash command for the join vc command
-*/
 /* REGISTER SPEECH EVENTS */
 client.on(SpeechEvents.speech, (msg) => {
     if (!msg.content) return;
@@ -264,6 +283,58 @@ client.on(SpeechEvents.speech, (msg) => {
         msg.content = msg.content.toLowerCase().replace('alias ', 'aliases');
     }
 
+    /* Mods Crush Adjustments */
+    // change mods crushes -> mods crush
+    if (msg.content.toLowerCase().includes('mods crushes')) {
+        msg.content = msg.content.toLowerCase().replace('mods crushes', 'mods crush');
+    }
+    // change mod crush -> mods crush
+    if (msg.content.toLowerCase().includes('mod crush')) {
+        msg.content = msg.content.toLowerCase().replace('mod crush', 'mods crush');
+    }
+    // change mod crushes -> mods crush
+    if (msg.content.toLowerCase().includes('mod crushes')) {
+        msg.content = msg.content.toLowerCase().replace('mod crushes', 'mods crush');
+    }
+
+    /* Ban Adjustments */
+    // change band -> ban
+    if (msg.content.toLowerCase().includes('band')) {
+        msg.content = msg.content.toLowerCase().replace('band', 'ban');
+    }
+    // change banned -> ban
+    if (msg.content.toLowerCase().includes('banned')) {
+        msg.content = msg.content.toLowerCase().replace('banned', 'ban');
+    }
+
+    /* Character Adjustments */
+    // change underscore -> _
+    if (msg.content.toLowerCase().includes('underscore')) {
+        msg.content = msg.content.toLowerCase().replace('underscore', '_');
+    }
+
+    // change dash -> -
+    if (msg.content.toLowerCase().includes('dash')) {
+        msg.content = msg.content.toLowerCase().replace('dash', '-');
+    }
+
+    // change dot -> .
+    if (msg.content.toLowerCase().includes('dot')) {
+        msg.content = msg.content.toLowerCase().replace('dot', '.');
+    }
+
+    // change slash -> /
+    if (msg.content.toLowerCase().includes('slash')) {
+        msg.content = msg.content.toLowerCase().replace('slash', '/');
+    }
+
+    // change period -> .
+    if (msg.content.toLowerCase().includes('period')) {
+        msg.content = msg.content.toLowerCase().replace('period', '.');
+    }
+    
+
+
     for (const fileVoice of commandVoiceFiles) {
         const commandVoice = require(`./src/voice-commands/${fileVoice}`);
         if (commandVoice.data.includes) {
@@ -281,37 +352,14 @@ client.on(SpeechEvents.speech, (msg) => {
         }
     }
 
-    // Register 'mods crush ___'s skull' command
-    if (msg.content.toLowerCase().startsWith('mods crush') || msg.content.toLowerCase().startsWith('mod crush') || msg.content.toLowerCase().startsWith('mods crushes') || msg.content.toLowerCase().startsWith('mod crushes')) {
-        let crush = msg.content.split(' ')[2];
-        if (crush === 'my') {
-            // set it to the user who spoke
-            crush = msg.member.user.username;
-        } else if (crush) {
-            let member = msg.guild.members.cache.find(member => member.user.username.toLowerCase() === crush.toLowerCase());
-            if (!member) {
-                try {
-                    member = msg.guild.members.cache.find(member => member.nickname.toLowerCase() === crush.toLowerCase());
-                } catch (error) {
-                    member = null;
-                }
-            }
-            if (member) {
-                const player = createAudioPlayer();
-                const resource = createAudioResource('./crush.mp3');
-                connection.subscribe(player);
-                player.play(resource);
-                setTimeout(() => {
-                    member.voice.disconnect();
-                    client.users.fetch('420059335486341122').then((user) => {
-                        user.send("**CRUSHED " + member.user.username + "'S SKULL**");
-                    });
-                }, 1000);
-            } else {
-                client.users.fetch('420059335486341122').then((user) => {
-                    user.send("**COULD NOT FIND " + crush + "**");
-                });
-            }
+    /* HANDLE CUSTOM VOICE COMMANDS */
+    const obj = JSON.parse(fs.readFileSync(path.resolve('./src/voice-commands.json')));
+    for (var key in obj) {
+        if (msg.content.toLowerCase().includes(key)) {
+            const player = createAudioPlayer();
+            const resource = createAudioResource('./audio-clips/' + obj[key]);
+            player.play(resource);
+            connection.subscribe(player);
         }
     }
 
@@ -326,38 +374,6 @@ client.on(SpeechEvents.speech, (msg) => {
         setTimeout(() => {
             connection.destroy();
         }, 2000);
-    }
-
-    // Register 'gun' command
-    if (msg.content.toLowerCase().includes('gun')) {
-        const player = createAudioPlayer();
-        const resource = createAudioResource('./audio-clips/gunshot.mp3');
-        connection.subscribe(player);
-        player.play(resource);
-    }
-
-    // Register 'bomb' command
-    if (msg.content.toLowerCase().includes('bomb') || msg.content.toLowerCase().includes('bom')) {
-        const player = createAudioPlayer();
-        const resource = createAudioResource('./audio-clips/explosion.mp3');
-        connection.subscribe(player);
-        player.play(resource);
-    }
-
-    // Register 'kill yourself' command
-    if (msg.content.toLowerCase().includes("kill yourself") && !msg.content.toLowerCase().includes("mods kill yourself")) {
-        const player = createAudioPlayer();
-        const resource = createAudioResource('./audio-clips/vine-boom.mp3');
-        connection.subscribe(player);
-        player.play(resource);
-    }
-
-    // Register 'i hate gingers' command
-    if (msg.content.toLowerCase().includes("i hate gingers")) {
-        const player = createAudioPlayer();
-        const resource = createAudioResource('./audio-clips/irish.mp3');
-        connection.subscribe(player);
-        player.play(resource);
     }
 });
 

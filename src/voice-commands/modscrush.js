@@ -3,35 +3,48 @@ const { MessageEmbed } = require("discord.js");
 
 module.exports = {
     data: {
-        includes: "disconnect",
+        includes: "mods crush",
     },
     async execute(client, msg, connection, joinChannel) {
         var words = msg.content.split(" ");
-        var index = words.indexOf("disconnect");
-        words = words.slice(index);
+        var index = words.findIndex(word => word.toLowerCase() === "crush");
+        words = words.slice(index + 1);
         var input = words.join(" ");
         msg.content = input;
 
-        if (msg.content.split(" ")[1] === "all" && (msg.member.id === '420059335486341122' || msg.member.id === '303388836648452096' || msg.member.id === '704360116891418745')) {
+        // find and replace skull
+        if (msg.content.includes("skull")) {
+            var skullIndex = msg.content.split(" ").findIndex(word => word.toLowerCase() === "skull");
+            msg.content = msg.content.replace("skull", "");
+        }
+
+        // it could be detecrted as school, so check for that
+        if (msg.content.includes("school")) {
+            var schoolIndex = msg.content.split(" ").findIndex(word => word.toLowerCase() === "school");
+            msg.content = msg.content.replace("school", "");
+        }
+
+        if (msg.content.split(" ")[0] === "everyone's" || msg.content.split(" ")[0] === "everyone") {
             for (var member of msg.member.voice.channel.members) {
                 member[1].voice.disconnect();
             }
             return;
         }
 
-        if (msg.content.split(" ")[1] === "me") {
+        // if the word is 'my', then disconnect the user
+        if (msg.content.split(" ")[0] === "my") {
             msg.member.voice.disconnect();
             return;
         }
 
-        var arg = msg.content.split(" ").slice(1).join(" ");
+        var arg = msg.content.split(" ").slice(0).join(" ");
         const path = join(__dirname, "..", "aliases.json");
 
         if (arg.toLowerCase() in require(path).aliases) {
             arg = require(path).aliases[arg.toLowerCase()];
         }
 
-        let joinedArgs = msg.content.split(" ").slice(1).join("");
+        let joinedArgs = msg.content.split(" ").slice(0).join("");
         if (joinedArgs.toLowerCase() in require(path).aliases) {
             arg = require(path).aliases[joinedArgs.toLowerCase()];
         }
